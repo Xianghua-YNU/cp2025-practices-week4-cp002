@@ -17,7 +17,10 @@ def load_data(filename):
         y: 电压数据数组
     """
     # 在此处编写代码，读取数据文件
-    pass
+    data = np.loadtxt(filename)  
+    x = data[:, 0]  # 第一列为频率
+    y = data[:, 1]  # 第二列为电压
+    return x, y
 
 def calculate_parameters(x, y):
     """
@@ -36,9 +39,18 @@ def calculate_parameters(x, y):
         Exy: xy的平均值
     """
     # 在此处编写代码，计算Ex, Ey, Exx, Exy, m和c
-    pass
-
+    Ex = np.mean(x)
+    Ey = np.mean(y)
+    Exx = np.mean(x**2)
+    Exy = np.mean(x * y)
+# 计算斜率和截距
+    m = (Exy - Ex * Ey) / (Exx - Ex**2)
+    c = Ey - m * Ex
+    
+    # 返回计算结果
+    return m, c, Ex, Ey, Exx, Exy
 def plot_data_and_fit(x, y, m, c):
+    
     """
     绘制数据点和拟合直线
     
@@ -52,7 +64,14 @@ def plot_data_and_fit(x, y, m, c):
         fig: matplotlib图像对象
     """
     # 在此处编写代码，绘制数据点和拟合直线
-    pass
+    fig, ax = plt.subplots()
+    ax.scatter(x, y, label="实验数据", color="blue")
+    ax.plot(x, m * x + c, label="拟合直线", color="red")
+    ax.set_xlabel("频率 (Hz)")
+    ax.set_ylabel("电压 (V)")
+    ax.legend()
+    ax.grid()
+    return fig
 
 def calculate_planck_constant(m):
     """
@@ -65,12 +84,24 @@ def calculate_planck_constant(m):
         h: 计算得到的普朗克常量值
         relative_error: 与实际值的相对误差(%)
     """
+    if m <= 0:
+        raise ValueError("斜率必须为正数")
+
     # 电子电荷
     e = 1.602e-19  # C
     
     # 在此处编写代码，计算普朗克常量和相对误差
     # 提示: 实际的普朗克常量值为 6.626e-34 J·s
-    pass
+    # 计算普朗克常量
+    h = m * e  # h = m * e
+    
+    # 实际普朗克常量值
+    h_actual = 6.626e-34  # J·s
+    
+    # 计算相对误差
+    relative_error = abs((h - h_actual) / h_actual) * 100
+
+    return h, relative_error
 
 def main():
     """主函数"""
